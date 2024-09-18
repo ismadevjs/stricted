@@ -1,8 +1,8 @@
 # Use an official Alpine Linux runtime as a parent image
 FROM alpine:latest
 
-# Install curl and bash
-RUN apk --no-cache add curl bash
+# Install bash, curl, and iptables
+RUN apk --no-cache add bash curl iptables
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
