@@ -1,17 +1,20 @@
-# Use an official Alpine Linux runtime as a parent image
+# Use an Alpine base image for a small footprint
 FROM alpine:latest
 
-# Install bash and curl
-RUN apk update && apk --no-cache add bash curl
-
-# Set the working directory in the container
-WORKDIR /usr/src/app
+# Install necessary tools
+RUN apk add --no-cache curl
 
 # Copy the shell script into the container
-COPY check_ip.sh .
+COPY log_visitors.sh /usr/local/bin/log_visitors.sh
 
-# Ensure the script is executable
-RUN chmod +x check_ip.sh
+# Make the shell script executable
+RUN chmod +x /usr/local/bin/log_visitors.sh
 
-# Run the shell script using bash
-CMD ["bash", "./check_ip.sh"]
+# Create a directory for logs
+RUN mkdir -p /app
+
+# Set the working directory
+WORKDIR /app
+
+# Run the shell script by default
+CMD ["/usr/local/bin/log_visitors.sh"]

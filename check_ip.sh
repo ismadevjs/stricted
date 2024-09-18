@@ -1,26 +1,13 @@
-#!/bin/bash
+#!/bin/sh
 
-# Define allowed IPs in an array
-allowed_ips=("123.123.123.123" "234.234.234.234")
+# Log file location
+LOGFILE="/app/visitor_log.txt"
 
-# Retrieve the real IP address from a request
-# Replace this with actual logic for your environment
-# For testing purposes, we'll use a placeholder IP address
-visitor_ip=$(curl -s http://api.ipify.org)
+# Get the current date and time
+TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 
-# Check if the visitor's IP is in the allowed list
-ip_found=false
-for ip in "${allowed_ips[@]}"; do
-  if [ "$visitor_ip" == "$ip" ]; then
-    ip_found=true
-    break
-  fi
-done
+# Fetch the visitor data
+VISITOR_DATA=$(curl -s -o /dev/null -w "%{http_code} %{url_effective}\n" https://jidli.com:8443/)
 
-# Log the result
-if [ "$ip_found" = true ]; then
-  echo "IP $visitor_ip is allowed."
-else
-  echo "IP $visitor_ip is not allowed."
-  # Optional: Configure firewall rules or other actions
-fi
+# Log the visitor data
+echo "$TIMESTAMP - Visitor Data: $VISITOR_DATA" >> $LOGFILE
