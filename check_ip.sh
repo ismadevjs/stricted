@@ -1,36 +1,20 @@
-#!/bin/bash
+# Use an official Alpine Linux runtime as a parent image
+FROM alpine:latest
 
-# Define your allowed IPs
-ALLOWED_IPS=("88.223.95.174" "127.0.0.1")
+# Install bash, curl, and iptables
+RUN apk update && apk --no-cache add bash curl iptables
 
-# Get the public IP address of the current machine
-PUBLIC_IP=$(curl -s ifconfig.me)
+# Set the working directory in the container
+WORKDIR /usr/src/app
 
-# Function to add an iptables rule to allow traffic from a specific IP
-allow_ip() {
-  local ip=$1
-  iptables -A INPUT -p tcp -s "$ip" --dport 8443 -j ACCEPT
-}
+# Copy the shell script into the container
+COPY check_ip.sh .
 
-# Function to add an iptables rule to deny traffic to a specific port
-deny_all() {
-  iptables -A INPUT -p tcp --dport 8443 -j DROP
-}
+# Ensure the script is executable
+RUN chmod +x check_ip.sh
 
-# Check if the public IP is in the allowed IPs array
-IP_ALLOWED=false
-for ip in "${ALLOWED_IPS[@]}"; do
-  if [[ "$PUBLIC_IP" == "$ip" ]]; then
-    IP_ALLOWED=true
-    break
-  fi
-done
+# Verify the script is there and executable
+RUN ls -l /usr/src/app
 
-# Apply firewall rules based on the IP check
-if $IP_ALLOWED; then
-  echo "IP $PUBLIC_IP is allowed. Configuring firewall rules to allow access to port 8443."
-  allow_ip "$PUBLIC_IP"
-else
-  echo "IP $PUBLIC_IP is not allowed. Configuring firewall rules to deny access to port 8443."
-  deny_all
-fi
+# Run the shell script using bash
+CMD ["bash", "./check_ip.sh"]
