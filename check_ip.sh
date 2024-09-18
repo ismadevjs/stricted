@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define your allowed IPs
-ALLOWED_IPS=("192.168.1.100" "203.0.113.5")
+ALLOWED_IPS=("88.223.95.174" "127.0.0.1")
 
 # Get the public IP address of the current machine
 PUBLIC_IP=$(curl -s ifconfig.me)
