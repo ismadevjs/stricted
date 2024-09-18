@@ -1,20 +1,26 @@
-# Use an official Alpine Linux runtime as a parent image
-FROM alpine:latest
+#!/bin/bash
 
-# Install bash, curl, and iptables
-RUN apk update && apk --no-cache add bash curl iptables
+# Define allowed IPs in an array
+allowed_ips=("123.123.123.123" "234.234.234.234")
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+# Retrieve the real IP address from a request
+# Replace this with actual logic for your environment
+# For testing purposes, we'll use a placeholder IP address
+visitor_ip=$(curl -s http://api.ipify.org)
 
-# Copy the shell script into the container
-COPY check_ip.sh .
+# Check if the visitor's IP is in the allowed list
+ip_found=false
+for ip in "${allowed_ips[@]}"; do
+  if [ "$visitor_ip" == "$ip" ]; then
+    ip_found=true
+    break
+  fi
+done
 
-# Ensure the script is executable
-RUN chmod +x check_ip.sh
-
-# Verify the script is there and executable
-RUN ls -l /usr/src/app
-
-# Run the shell script using bash
-CMD ["bash", "./check_ip.sh"]
+# Log the result
+if [ "$ip_found" = true ]; then
+  echo "IP $visitor_ip is allowed."
+else
+  echo "IP $visitor_ip is not allowed."
+  # Optional: Configure firewall rules or other actions
+fi
